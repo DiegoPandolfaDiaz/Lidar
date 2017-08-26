@@ -1,0 +1,5 @@
+python: can't open file 'conexionLIDAR.py': [Errno 13] Permission denied
+Traceback (most recent call last):
+  File "muestreo.py", line 2, in <module>
+    x=5;
+KeyboardInterrupt

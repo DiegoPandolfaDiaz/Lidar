@@ -1,0 +1,3 @@
+lidar;03
+VelocidadMotor;10
+TamanoArchivo;1000
