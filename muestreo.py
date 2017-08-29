@@ -1,4 +1,4 @@
-
+import os
 import time
 import sys
 import serial
@@ -32,7 +32,7 @@ def main():
 		config_file = open("configuraciones.txt",'r')
 	except(serial.serialutil.SerialException()):
 		print "conecte los dispositivos, intentelo de nuevo por favor"
-		exit(1)
+		exit(-1)
 
 	print "configurando lidar..."
 	# se configura el lidar
@@ -88,32 +88,39 @@ def main():
 	input_serial_gps= ''
 	input_serial_lidar = ''
 	input_serial_imu = ''
-	while(1):
-		if(ser_gps.inWaiting()>0):
-			input_serial_gps = ser_gps.readline().decode('UTF-8').strip()
-			ser_gps.flushInput()
 
-		if(ser_imu.inWaiting()>0):
-			input_serial_imu = ser_imu.read(81)
-			input_serial_imu = input_serial_imu.encode("hex")
-			ser_imu.flushInput()
-			#out += "," + input_serial.encode("hex")
-			#print out.encode("hex")
-			#print ","
-			#print input_serial_imu[0:2], input_serial_lidar[0:4]
+	try :
+		while(1):
+			if(ser_gps.inWaiting()>0):
+				input_serial_gps = ser_gps.readline().decode('UTF-8').strip()
+				ser_gps.flushInput()
 
-		if(ser_lidar.inWaiting()>0):
-			input_serial_lidar = ser_lidar.read(7)
-			input_serial_lidar = input_serial_lidar.encode("hex")
-			ser_lidar.flushInput()
-			if(input_serial_lidar[0:2] == "00" and input_serial_imu[0:4] == "faff"):
-				out = input_serial_lidar + "," + input_serial_imu + "," + input_serial_gps
-				file.write(out+'\n');
-			#out += "," + input_serial_lidar.encode("hex") + "," + input_serial_imu.encode("hex")
-		#out = input_serial_lidar.encode("hex") + "," + input_serial_imu.encode("hex")
-	#	if(out != ''):
-	#		file.write(out+'\n');
-	file.close()
+			if(ser_imu.inWaiting()>0):
+				input_serial_imu = ser_imu.read(81)
+				input_serial_imu = input_serial_imu.encode("hex")
+				ser_imu.flushInput()
+				#out += "," + input_serial.encode("hex")
+				#print out.encode("hex")
+				#print ","
+				#print input_serial_imu[0:2], input_serial_lidar[0:4]
+
+			if(ser_lidar.inWaiting()>0):
+				input_serial_lidar = ser_lidar.read(7)
+				input_serial_lidar = input_serial_lidar.encode("hex")
+				ser_lidar.flushInput()
+				if(input_serial_lidar[0:2] == "00" and input_serial_imu[0:4] == "faff"):
+					out = input_serial_lidar + "," + input_serial_imu + "," + input_serial_gps
+					file.write(out+'\n');
+					#out += "," + input_serial_lidar.encode("hex") + "," + input_serial_imu.encode("hex")
+					#out = input_serial_lidar.encode("hex") + "," + input_serial_imu.encode("hex")
+		#	if(out != ''):
+		#		file.write(out+'\n');
+			if(os.stat("output.txt").st_size >= int(lines[2].strip().split(';')[1])*1000000):
+				file.close()
+				print "Max Size Reached"
+				break
+	except(KeyboardInterrupt):
+		file.close()
 
 if __name__ == '__main__':
 	main()
